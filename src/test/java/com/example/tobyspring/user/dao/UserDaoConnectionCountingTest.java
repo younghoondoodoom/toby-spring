@@ -4,17 +4,13 @@ import com.example.tobyspring.user.domain.User;
 import java.sql.SQLException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
 
-class UserDaoTest {
+public class UserDaoConnectionCountingTest {
 
     public static void main(String[] args)
         throws SQLException, ClassNotFoundException {
         ApplicationContext context =
-            new GenericXmlApplicationContext("applicationContext.xml");
-//        ApplicationContext context =
-//            new AnnotationConfigApplicationContext(DaoFactory.class);
-
+            new AnnotationConfigApplicationContext(DaoFactory.class);
 
         UserDao dao = context.getBean("userDao", UserDao.class);
 
@@ -32,5 +28,9 @@ class UserDaoTest {
         System.out.println(user2.getPassword());
 
         System.out.println(user2.getId() + " 조회 성공");
+
+        CountingConnectionMaker ccm = context.getBean(
+            "connectionMaker", CountingConnectionMaker.class);
+        System.out.println("Connection counter : " + ccm.getCounter());
     }
 }
