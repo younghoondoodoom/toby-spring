@@ -29,4 +29,10 @@ class CalculatorTest {
         assertThat(calculator.calcMultiply(numFilePath)).isEqualTo(24);
 
     }
+
+    @Test
+    public void concatenateStrings() throws Exception {
+        // then
+        assertThat(calculator.concatenate(numFilePath)).isEqualTo("1234");
+    }
 }
