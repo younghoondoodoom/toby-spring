@@ -2,7 +2,6 @@ package com.example.tobyspring.user.dao;
 
 import com.example.tobyspring.user.domain.User;
 import java.sql.SQLException;
-import org.springframework.boot.web.servlet.context.XmlServletWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 
@@ -13,7 +12,7 @@ public class UserDaoConnectionCountingTest {
         ApplicationContext context =
             new GenericXmlApplicationContext("test-applicationContext.xml");
 
-        UserDao dao = context.getBean("userDao", UserDao.class);
+        UserDaoJdbc dao = context.getBean("userDao", UserDaoJdbc.class);
 
         User user = new User();
         user.setId("whiteship");
