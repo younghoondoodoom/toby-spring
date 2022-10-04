@@ -2,7 +2,7 @@ package com.example.tobyspring.user.service;
 
 import com.example.tobyspring.user.domain.User;
 
-public class TestUserService extends UserService {
+public class TestUserService extends UserServiceImpl {
 
     private String id;
 
