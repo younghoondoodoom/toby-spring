@@ -22,12 +22,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,6 +37,8 @@ class UserServiceTest {
     @Autowired
     UserService userService;
     @Autowired
+    UserService testUserService;
+    @Autowired
     UserDao userDao;
     @Autowired
     DataSource dataSource;
@@ -48,6 +48,19 @@ class UserServiceTest {
     MailSender mailSender;
     @Autowired
     ApplicationContext context;
+
+    static class TestUserService extends UserServiceImpl {
+
+        private String id = "madniel1";
+
+        @Override
+        protected void upgradeLevel(User user) {
+            if (user.getId().equals(this.id)) {
+                throw new TestUserServiceException();
+            }
+            super.upgradeLevel(user);
+        }
+    }
 
     private List<User> users;
 
@@ -62,7 +75,8 @@ class UserServiceTest {
                 MIN_RECOMMEND_FOR_GOLD - 1, "erwins@test.com"),
             new User("madniel1", "이상호", "p4", Level.SILVER, 60,
                 MIN_RECOMMEND_FOR_GOLD, "madniel1@test.com"),
-            new User("green", "오민규", "p5", Level.GOLD, Integer.MAX_VALUE, Integer.MAX_VALUE, "green@test.com")
+            new User("green", "오민규", "p5", Level.GOLD, Integer.MAX_VALUE,
+                Integer.MAX_VALUE, "green@test.com")
         );
     }
 
@@ -113,9 +127,11 @@ class UserServiceTest {
             SimpleMailMessage.class);
         verify(mockMailSender, times(2)).send(mailMessageArg.capture());
         List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
-        assertThat(Objects.requireNonNull(mailMessages.get(0).getTo())[0]).isEqualTo(
+        assertThat(
+            Objects.requireNonNull(mailMessages.get(0).getTo())[0]).isEqualTo(
             users.get(1).getEmail());
-        assertThat(Objects.requireNonNull(mailMessages.get(1).getTo())[0]).isEqualTo(
+        assertThat(
+            Objects.requireNonNull(mailMessages.get(1).getTo())[0]).isEqualTo(
             users.get(3).getEmail());
     }
 
@@ -158,30 +174,25 @@ class UserServiceTest {
     }
 
     @Test
-    @DirtiesContext
     public void upgradeAllOrNothing() throws Exception {
-        TestUserService testUserService = new TestUserService(
-            users.get(3).getId());
-        testUserService.setUserDao(userDao);
-        testUserService.setMailSender(mailSender);
-
-        ProxyFactoryBean txProxyFactoryBean =
-            context.getBean("&userService", ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
-        UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);
         }
 
         try {
-            txUserService.upgradeLevels();
+            this.testUserService.upgradeLevels();
             fail("TestUserServiceException expected");
         } catch (TestUserServiceException e) {
         }
 
         checkLevelUpgraded(users.get(1), false);
+    }
+
+    @Test
+    public void advisorAutoproxyCreator() {
+        assertThat(
+            testUserService instanceof java.lang.reflect.Proxy).isTrue();
     }
 
 }
