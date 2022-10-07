@@ -29,6 +29,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/test-applicationContext.xml")
@@ -48,6 +49,7 @@ class UserServiceTest {
     MailSender mailSender;
     @Autowired
     ApplicationContext context;
+    private List<User> users;
 
     static class TestUserService extends UserServiceImpl {
 
@@ -61,8 +63,6 @@ class UserServiceTest {
             super.upgradeLevel(user);
         }
     }
-
-    private List<User> users;
 
     @BeforeEach
     public void setUp() {
@@ -193,6 +193,15 @@ class UserServiceTest {
     public void advisorAutoproxyCreator() {
         assertThat(
             testUserService instanceof java.lang.reflect.Proxy).isTrue();
+    }
+
+    @Test
+    @Transactional
+    public void transactionSync() throws Exception {
+        userService.deleteAll();
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+        assertThat(userDao.getCount()).isEqualTo(2);
     }
 
 }
