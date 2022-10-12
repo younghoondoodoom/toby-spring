@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:aop="http://www.springframework.org/schema/aop"
-  xmlns:tx="http://www.springframework.org/schema/tx"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
   http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://www.springframework.org/schema/aop
-  http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context-3.0.xsd
   http://www.springframework.org/schema/tx
   http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
   <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
     <property name="driverClass" value="org.mariadb.jdbc.Driver"></property>
-    <property name="url" value="jdbc:mariadb://localhost:3306/tobyspring"></property>
+    <property name="url" value="jdbc:mariadb://localhost:3306/testdb"></property>
     <property name="username" value="doodoom"></property>
     <property name="password" value="dudgns2684"></property>
   </bean>
@@ -22,19 +22,23 @@
     <property name="dataSource" ref="dataSource"></property>
   </bean>
 
+  <context:annotation-config/>
+
   <!--  aop -->
-  <aop:config>
-    <aop:advisor advice-ref="transactionAdvice" pointcut="bean(*Service)"></aop:advisor>
-  </aop:config>
+  <tx:annotation-driven/>
 
-  <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"></bean>
+  <!--  <aop:config>-->
+  <!--    <aop:advisor advice-ref="transactionAdvice" pointcut="bean(*Service)"></aop:advisor>-->
+  <!--  </aop:config>-->
 
-  <tx:advice id="transactionAdvice">
-    <tx:attributes>
-      <tx:method name="get*" read-only="true"></tx:method>
-      <tx:method name="*"></tx:method>
-    </tx:attributes>
-  </tx:advice>
+  <!--  <tx:advice id="transactionAdvice">-->
+  <!--    <tx:attributes>-->
+  <!--      <tx:method name="get*" read-only="true"></tx:method>-->
+  <!--      <tx:method name="*"></tx:method>-->
+  <!--    </tx:attributes>-->
+  <!--  </tx:advice>-->
+
+  <!--  <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"></bean>-->
 
   <!--  <bean id="transactionAdvice" class="org.springframework.transaction.interceptor.TransactionInterceptor">-->
   <!--    <property name="transactionManager" ref="transactionManager" />-->
@@ -45,7 +49,6 @@
   <!--      </props>-->
   <!--    </property>-->
   <!--  </bean>-->
-
 
   <!--  <bean id="transactionPointcut" class="org.springframework.aop.aspectj.AspectJExpressionPointcut">-->
   <!--    <property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))" />-->
@@ -59,11 +62,20 @@
   <!-- application components -->
   <bean id="userDao" class="com.example.tobyspring.user.dao.UserDaoJdbc">
     <property name="dataSource" ref="dataSource"></property>
+    <property name="sqlService" ref="sqlService"></property>
   </bean>
 
-  <bean id="userServiceImpl" class = "com.example.tobyspring.user.service.UserServiceImpl">
-    <property name = "userDao" ref = "userDao"></property>
-    <property name = "mailSender" ref = "mailSender"></property>
+  <bean id="sqlService" class="com.example.tobyspring.user.sqlService.SimpleSqlService">
+    <property name="sqlMap">
+      <map>
+        <entry key="userAdd" value="insert into users(id, name, password, level, login, recommend, email) values (?,?,?,?,?,?,?)"></entry>
+        <entry key="userGet" value="select * from users where id = ?"></entry>
+        <entry key="userGetAll" value="select * from users order by id"></entry>
+        <entry key="userDeleteAll" value="delete from users"></entry>
+        <entry key="userGetCount" value="select count(*) from users"></entry>
+        <entry key="userUpdate" value="update users set name = ?, password = ?, email = ?, level =?, login = ?, recommend =? where id = ?"></entry>
+      </map>
+    </property>
   </bean>
 
   <bean id="userService" class="com.example.tobyspring.user.service.UserServiceImpl">
@@ -72,8 +84,9 @@
   </bean>
 
   <bean id="testUserService"
-    class="com.example.tobyspring.user.service.UserServiceTest$TestUserService"
-    parent="userService"></bean>
+        class="com.example.tobyspring.user.service.UserServiceTest$TestUserService"
+        parent="userService">
+  </bean>
 
   <bean id="mailSender" class="com.example.tobyspring.user.service.DummyMailSender"></bean>
 </beans>
