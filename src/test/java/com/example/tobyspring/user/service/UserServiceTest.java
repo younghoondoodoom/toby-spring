@@ -1,23 +1,9 @@
 package com.example.tobyspring.user.service;
 
-import static com.example.tobyspring.user.service.UserServiceImpl.MIN_LOGIN_COUNT_FOR_SILVER;
-import static com.example.tobyspring.user.service.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.example.tobyspring.user.dao.MockUserDao;
 import com.example.tobyspring.user.dao.UserDao;
 import com.example.tobyspring.user.domain.Level;
 import com.example.tobyspring.user.domain.User;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +17,17 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import static com.example.tobyspring.user.service.UserServiceImpl.MIN_LOGIN_COUNT_FOR_SILVER;
+import static com.example.tobyspring.user.service.UserServiceImpl.MIN_RECOMMEND_FOR_GOLD;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/test-applicationContext.xml")
 class UserServiceTest {
@@ -41,8 +38,6 @@ class UserServiceTest {
     UserService testUserService;
     @Autowired
     UserDao userDao;
-    @Autowired
-    DataSource dataSource;
     @Autowired
     PlatformTransactionManager transactionManager;
     @Autowired
@@ -61,6 +56,7 @@ class UserServiceTest {
                 throw new TestUserServiceException();
             }
             super.upgradeLevel(user);
+
         }
     }
 

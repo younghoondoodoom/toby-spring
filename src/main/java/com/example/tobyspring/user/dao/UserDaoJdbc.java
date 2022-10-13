@@ -92,9 +92,9 @@ public class UserDaoJdbc implements UserDao {
     @Override
     public void update(User user) {
         jdbcTemplate.update(
-                this.sqlService.getSql("userUpdate"), user.getName(),
+                this.sqlService.getSql("userUpdate"), user.getId(), user.getName(),
                 user.getPassword(), user.getLevel().intValue(), user.getLogin(),
-                user.getRecommend(), user.getEmail(), user.getId());
+                user.getRecommend(), user.getEmail());
     }
 
 }
