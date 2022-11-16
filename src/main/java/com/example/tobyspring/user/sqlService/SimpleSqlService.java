@@ -3,7 +3,9 @@ package com.example.tobyspring.user.sqlService;
 import com.example.tobyspring.exception.SqlRetrievalFailureException;
 
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SimpleSqlService implements SqlService {
     private Map<String, String> sqlMap;
 

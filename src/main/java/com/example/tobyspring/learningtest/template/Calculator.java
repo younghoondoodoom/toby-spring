@@ -8,7 +8,7 @@ public class Calculator {
 
     public Integer calcSum(String filePath) throws IOException {
         LineCallBack<Integer> sumCallBack =
-            new LineCallBack<>() {
+            new LineCallBack<Integer>() {
                 @Override
                 public Integer doSomethingWithLine(String line, Integer value) {
                     return value + Integer.parseInt(line);

@@ -3,22 +3,25 @@ package com.example.tobyspring.user.dao;
 import com.example.tobyspring.user.domain.Level;
 import com.example.tobyspring.user.domain.User;
 import com.example.tobyspring.user.sqlService.SqlService;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UserDaoJdbc implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
+    @Autowired
     private SqlService sqlService;
     private RowMapper<User> userMapper =
             new RowMapper<User>() {
@@ -37,12 +40,9 @@ public class UserDaoJdbc implements UserDao {
                 }
             };
 
+    @Autowired
     public void setDataSource(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
-    public void setSqlService(SqlService sqlService) {
-        this.sqlService = sqlService;
     }
 
     public void add(final User user) {
@@ -92,9 +92,9 @@ public class UserDaoJdbc implements UserDao {
     @Override
     public void update(User user) {
         jdbcTemplate.update(
-                this.sqlService.getSql("userUpdate"), user.getId(), user.getName(),
+                this.sqlService.getSql("userUpdate"), user.getName(),
                 user.getPassword(), user.getLevel().intValue(), user.getLogin(),
-                user.getRecommend(), user.getEmail());
+                user.getRecommend(), user.getEmail(), user.getId());
     }
 
 }

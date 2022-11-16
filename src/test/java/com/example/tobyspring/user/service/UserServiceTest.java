@@ -1,5 +1,6 @@
 package com.example.tobyspring.user.service;
 
+import com.example.tobyspring.config.TestApplicationContext;
 import com.example.tobyspring.user.dao.MockUserDao;
 import com.example.tobyspring.user.dao.UserDao;
 import com.example.tobyspring.user.domain.Level;
@@ -29,8 +30,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = "/test-applicationContext.xml")
-class UserServiceTest {
+@ContextConfiguration(classes = TestApplicationContext.class)
+public class UserServiceTest {
 
     @Autowired
     UserService userService;
@@ -45,20 +46,6 @@ class UserServiceTest {
     @Autowired
     ApplicationContext context;
     private List<User> users;
-
-    static class TestUserService extends UserServiceImpl {
-
-        private String id = "madniel1";
-
-        @Override
-        protected void upgradeLevel(User user) {
-            if (user.getId().equals(this.id)) {
-                throw new TestUserServiceException();
-            }
-            super.upgradeLevel(user);
-
-        }
-    }
 
     @BeforeEach
     public void setUp() {
@@ -170,7 +157,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void upgradeAllOrNothing() throws Exception {
+    public void upgradeAllOrNothing() {
         userDao.deleteAll();
         for (User user : users) {
             userDao.add(user);

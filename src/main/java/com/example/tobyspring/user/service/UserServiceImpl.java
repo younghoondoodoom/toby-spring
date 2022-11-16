@@ -6,7 +6,9 @@ import com.example.tobyspring.user.domain.User;
 import java.util.List;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     public static final int MIN_LOGIN_COUNT_FOR_SILVER = 50;
